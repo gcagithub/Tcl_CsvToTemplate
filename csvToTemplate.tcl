@@ -4,7 +4,7 @@
 # Script runs throught the csv file and substitutes
 # placeholders in pattern by cell values.
 #
-#    @args: 'csv_file' 'template_file' 'output_fileName' ?csv line counts?
+#    @args: 'csv_file' 'template_file' 'output_fileName' ?csv delim? ?csv line counts?
 #    @return: 'output_fileName'
 #
 
@@ -14,21 +14,24 @@
 # 				"out2.sql"]
 
 if {[llength $argv] < 3} {
-	puts "You must use 4 parameters."
+	puts "You may use 5 parameters. Only first 3 param mandatory."
 	puts "Please, set CSV file, Template file, exported file and number of lines"
-	puts "Ex: 'csvFile.csv' 'tmplFile.sql' 'outPut.sql'"
+	puts "Ex: 'csvFile.csv' 'tmplFile.sql' 'outPut.sql' ?csv delim? ?csv line counts?"
 	exit
 } else {
 	set _CSV_FILE [lindex $argv 0]
 	set _TMPL_FILE [lindex $argv 1]
 	set _OUT_FILE [lindex $argv 2]
-	set _COUNT [lindex $argv 3]
+	set _DELIM [lindex $argv 3]
+	set _COUNT [lindex $argv 4]
 	puts "Csv file = $_CSV_FILE"
 	puts "Template file = $_TMPL_FILE"
 	puts "Export file = $_OUT_FILE"
 }
 
-set _DELIM ";"
+set _DELIM [expr {$_DELIM != "" ? $_DELIM  : ";"}]
+
+# if {$_DELIM == ""} {set _DELIM ";"}
 
 ### Gets template from file ###
 set tmplFileId [open $_TMPL_FILE r]
@@ -68,7 +71,11 @@ proc getColumnValue { index } {
 	upvar 1 _DELIM delim
 
 	set csvList [split $csv $delim]
-	lindex $csvList [expr {$index - 1}]
+	set result [lindex $csvList [expr {$index - 1}]]
+#	if {$result == ""} {
+#		set result "null"
+#	}
+	return $result
 }
 
 ### Reads rows from csv file and writes to output file ###
