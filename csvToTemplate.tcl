@@ -4,7 +4,7 @@
 # Script runs throught the csv file and substitutes
 # placeholders in pattern by cell values.
 #
-#    @args: 'csv_file' 'template_file' 'output_fileName' ?csv delim? ?csv line counts?
+#    @args: 'csv_file' 'template_file' 'output_fileName' ?csv line counts? ?csv delim?
 #    @return: 'output_fileName'
 #
 
@@ -14,7 +14,7 @@
 # 				"out2.sql"]
 
 if {[llength $argv] < 3} {
-	puts "You may use 5 parameters. Only first 3 param mandatory."
+	puts "You may use 5 parameters. "
 	puts "Please, set CSV file, Template file, exported file and number of lines"
 	puts "Ex: 'csvFile.csv' 'tmplFile.sql' 'outPut.sql' ?csv delim? ?csv line counts?"
 	exit
@@ -58,12 +58,11 @@ if {[linecount $_TMPL_FILE] > 40} {
 
 puts "Counting lines in $_CSV_FILE ..."
 	if {$_COUNT != ""} {
-		set totalLines $count
 		puts "Process only $_COUNT lines"
 	} else {
-		set totalLines [linecount $_CSV_FILE]
+		set _COUNT [linecount $_CSV_FILE]
 	}
-puts "Total lines = $totalLines"
+puts "Total lines = $_COUNT"
 
 ### Gets value from cell in csv row  ###
 proc getColumnValue { index } {
@@ -82,9 +81,10 @@ proc getColumnValue { index } {
 set input [open $_CSV_FILE r]
 set output [open $_OUT_FILE a]
 while {[gets $input csvLine] >= 0} {
+	set _INDEX [incr i]
 	puts $output [subst $tmplFileData]
-	puts -nonewline "\rProgress... [incr i]|$totalLines"
-	if {$_COUNT != "" && $i == $_COUNT} {
+	puts -nonewline "\rProgress... $_INDEX|$_COUNT"
+	if {$_INDEX == $_COUNT} {
 		break;
 	}
 }
