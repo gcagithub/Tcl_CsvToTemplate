@@ -86,7 +86,7 @@ fconfigure $output -encoding utf-8
 while {[gets $input csvLine] >= 0} {
 	incr _INDEX
 	if {$_INDEX == $_COUNT} {
-		set $_IS_ROWEND 1
+		set _IS_ROWEND 1
 	}
 	set out [string trim [subst $tmplFileData]]
 	if { [string length $out] > 0 } {
