@@ -70,7 +70,8 @@ proc getColumnValue { index } {
 	upvar 1 _DELIM delim
 
 	set csvList [split $csv $delim]
-	set result [lindex $csvList [expr {$index - 1}]]
+	set columnValue [lindex $csvList [expr {$index - 1}]]
+	set result [string map {' `} $columnValue]
 #	if {$result == ""} {
 #		set result "null"
 #	}
@@ -83,12 +84,18 @@ fconfigure $input -encoding utf-8
 set output [open $_OUT_FILE a]
 fconfigure $output -encoding utf-8
 while {[gets $input csvLine] >= 0} {
-	set _INDEX [incr i]
-	set out [subst $tmplFileData]
-	puts $output $out
-	puts -nonewline "\rProgress... $_INDEX|$_COUNT"
+	incr _INDEX
 	if {$_INDEX == $_COUNT} {
-		break;
+		set $_IS_ROWEND 1
+	}
+	set out [string trim [subst $tmplFileData]]
+	if { [string length $out] > 0 } {
+		puts $output $out
+		incr _ROW
+	}
+	puts -nonewline "\rProgress... $_INDEX|$_COUNT"
+	if { $_IS_ROWEND } {
+		break
 	}
 }
   close $input
